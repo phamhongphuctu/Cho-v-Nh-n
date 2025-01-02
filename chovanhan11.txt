@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cho và Nhận</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database.js"></script>
+
+    <script>
+        // Cấu hình Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCT0fjjg5kmbnNka1nvLUgwv0hDgCQ1g40",
+            authDomain: "cho-va-nhan-278c4.firebaseapp.com",
+            databaseURL: "https://cho-va-nhan-278c4-default-rtdb.firebaseio.com",
+            projectId: "cho-va-nhan-278c4",
+            storageBucket: "cho-va-nhan-278c4.appspot.com",
+            messagingSenderId: "841295917185",
+            appId: "1:841295917185:web:808d1d23f5af41b1c8dd80",
+            measurementId: "G-GRSHJXG5YP"
+        };
+
+        // Khởi tạo Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cho và Nhận</h1>
+    </header>
+    <main>
+        <h2>Danh sách tin cho và nhận</h2>
+        <div id="postsContainer"></div>
+
+        <h2>Đăng tin của bạn</h2>
+        <form id="postForm">
+            <label for="name">Tên:</label><br>
+            <input type="text" id="name" name="name" required><br><br>
+            <label for="content">Nội dung:</label><br>
+            <textarea id="content" name="content" rows="4" cols="50" required></textarea><br><br>
+            <button type="submit">Đăng tin</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 Cho và Nhận</p>
+    </footer>
+
+    <script>
+        // Lắng nghe sự kiện submit của form
+        const postForm = document.getElementById('postForm');
+        const postsContainer = document.getElementById('postsContainer');
+
+        postForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const content = document.getElementById('content').value;
+
+            if (name && content) {
+                // Ghi dữ liệu vào Firebase
+                const newPostKey = db.ref().child('posts').push().key;
+                db.ref('posts/' + newPostKey).set({
+                    name: name,
+                    content: content,
+                })
+                .then(() => {
+                    alert('Tin đã được đăng thành công!');
+                    postForm.reset();
+                    loadPosts(); // Cập nhật danh sách sau khi đăng tin
+                })
+                .catch((error) => {
+                    console.error('Lỗi khi ghi dữ liệu:', error);
+                });
+            }
+        });
+
+        // Hàm tải danh sách tin từ Firebase
+        function loadPosts() {
+            db.ref('posts').once('value', (snapshot) => {
+                postsContainer.innerHTML = '';
+                snapshot.forEach((childSnapshot) => {
+                    const post = childSnapshot.val();
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.innerHTML = `<strong>${post.name}</strong><p>${post.content}</p>`;
+                    postsContainer.appendChild(div);
+                });
+            });
+        }
+
+        // Tải danh sách tin ngay khi trang được tải
+        window.onload = loadPosts;
+    </script>
+</body>
+</html>
