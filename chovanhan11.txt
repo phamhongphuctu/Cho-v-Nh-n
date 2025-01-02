@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cho và Nhận</title>
+    <title>Cho và Nhận Miễn Phí</title>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database.js"></script>
-
     <script>
         // Cấu hình Firebase
         const firebaseConfig = {
@@ -75,12 +74,12 @@
 </head>
 <body>
     <header>
-        <h1>Cho và Nhận</h1>
+        <h1>Cho và Nhận Miễn Phí</h1>
     </header>
     <main>
         <h2>Danh sách tin cho và nhận</h2>
         <div id="postsContainer"></div>
-
+        
         <h2>Đăng tin của bạn</h2>
         <form id="postForm">
             <label for="name">Tên:</label><br>
@@ -91,7 +90,7 @@
         </form>
     </main>
     <footer>
-        <p>&copy; 2025 Cho và Nhận</p>
+        <p>&copy; 2025 Cho và Nhận Miễn Phí</p>
     </footer>
 
     <script>
@@ -142,3 +141,4 @@
     </script>
 </body>
 </html>
+
