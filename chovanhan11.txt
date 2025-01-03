@@ -4,40 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cho và Nhận Miễn Phí</title>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database.js"></script>
-    <script>
-        // Cấu hình Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCT0fjjg5kmbnNka1nvLUgwv0hDgCQ1g40",
-            authDomain: "cho-va-nhan-278c4.firebaseapp.com",
-            databaseURL: "https://cho-va-nhan-278c4-default-rtdb.firebaseio.com",
-            projectId: "cho-va-nhan-278c4",
-            storageBucket: "cho-va-nhan-278c4.appspot.com",
-            messagingSenderId: "841295917185",
-            appId: "1:841295917185:web:808d1d23f5af41b1c8dd80",
-            measurementId: "G-GRSHJXG5YP"
-        };
-
-        // Khởi tạo Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-    </script>
-
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #8e44ad, #9b59b6); /* Hiệu ứng gradient màu tím */
+    color: #fff;
+}
+
         header {
             background-color: #333;
             color: white;
-            padding: 10px 0;
+            padding: 20px 0;
             text-align: center;
         }
         main {
@@ -49,7 +28,27 @@
             padding: 15px;
             margin: 10px 0;
             border-radius: 5px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
         }
+        .card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .card-content {
+            flex-grow: 1;
+        }
+        .card-content h3 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #007bff;
+        }
+        .card-content p {
+    color: #333; /* Đổi màu chữ thành tối */
+}
         button {
             padding: 10px 20px;
             background-color: #007bff;
@@ -61,83 +60,229 @@
         button:hover {
             background-color: #0056b3;
         }
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-            position: fixed;
-            bottom: 0;
+        .form-container {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #d8b9e8, #c694e6); /* Hiệu ứng gradient tím */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: #333;
+}
+
+        input, textarea, select {
             width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        input[type="file"] {
+            padding: 5px;
         }
     </style>
 </head>
 <body>
     <header>
         <h1>Cho và Nhận Miễn Phí</h1>
+        <div id="userGreeting" style="display: none;">
+            <p>Chào, <span id="username"></span>!</p>
+            <button onclick="logout()">Đăng xuất</button>
+        </div>
     </header>
     <main>
-        <h2>Danh sách tin cho và nhận</h2>
-        <div id="postsContainer"></div>
-        
-        <h2>Đăng tin của bạn</h2>
-        <form id="postForm">
-            <label for="name">Tên:</label><br>
-            <input type="text" id="name" name="name" required><br><br>
-            <label for="content">Nội dung:</label><br>
-            <textarea id="content" name="content" rows="4" cols="50" required></textarea><br><br>
-            <button type="submit">Đăng tin</button>
-        </form>
+        <div id="appContent" style="display: none;">
+            <h2>Danh sách bài đăng</h2>
+            <div id="postsContainer"></div>
+            
+            <h2>Đăng bài mới</h2>
+            <form id="postForm">
+                <input type="text" id="name" placeholder="Tên" required>
+                <textarea id="content" rows="4" placeholder="Nội dung" required></textarea>
+                <select id="type">
+                    <option value="Cho">Cho</option>
+                    <option value="Nhận">Nhận</option>
+                </select>
+                <input type="file" id="image" accept="image/*">
+                <button type="submit">Đăng bài</button>
+            </form>
+        </div>
     </main>
-    <footer>
-        <p>&copy; 2025 Cho và Nhận Miễn Phí</p>
-    </footer>
 
     <script>
-        // Lắng nghe sự kiện submit của form
-        const postForm = document.getElementById('postForm');
-        const postsContainer = document.getElementById('postsContainer');
+        // Kiểm tra trạng thái đăng nhập
+        function checkLogin() {
+            const currentUser = localStorage.getItem('currentUser');
+            const main = document.querySelector('main');
 
-        postForm.addEventListener('submit', (e) => {
+            if (currentUser) {
+                document.getElementById('userGreeting').style.display = 'block';
+                document.getElementById('appContent').style.display = 'block';
+                document.getElementById('username').textContent = currentUser;
+            } else {
+                document.getElementById('userGreeting').style.display = 'none';
+                document.getElementById('appContent').style.display = 'none';
+
+                // Thêm giao diện khi chưa đăng nhập
+                main.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <h2>Chào mừng bạn đến với Cho và Nhận Miễn Phí!</h2>
+                        <p>Vui lòng <button onclick="showLogin()">Đăng nhập</button> hoặc <button onclick="showRegister()">Đăng ký</button> để sử dụng.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Hiển thị form đăng nhập
+function showLogin() {
+    const main = document.querySelector('main');
+    main.innerHTML = `
+        <div class="form-container">
+            <h2>Đăng nhập</h2>
+            <input type="text" id="loginUsername" placeholder="Tên người dùng" required>
+            <input type="password" id="loginPassword" placeholder="Mật khẩu" required>
+            <button onclick="login()">Đăng nhập</button>
+            <button onclick="returnToHome()">Quay lại trang chủ</button>
+        </div>
+    `;
+}
+
+// Hiển thị form đăng ký
+function showRegister() {
+    const main = document.querySelector('main');
+    main.innerHTML = `
+        <div class="form-container">
+            <h2>Đăng ký</h2>
+            <input type="text" id="registerUsername" placeholder="Tên người dùng" required>
+            <input type="password" id="registerPassword" placeholder="Mật khẩu" required>
+            <button onclick="register()">Đăng ký</button>
+            <button onclick="returnToHome()">Quay lại trang chủ</button>
+        </div>
+    `;
+}
+
+// Quay lại trang chủ
+function returnToHome() {
+    const main = document.querySelector('main');
+    main.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+            <h2>Chào mừng bạn đến với Cho và Nhận Miễn Phí!</h2>
+            <p>Vui lòng <button onclick="showLogin()">Đăng nhập</button> hoặc <button onclick="showRegister()">Đăng ký</button> để sử dụng.</p>
+        </div>
+    `;
+}
+
+
+
+        // Đăng ký người dùng
+        function register() {
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+
+            if (!username || !password) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            if (users[username]) {
+                alert('Tên người dùng đã tồn tại!');
+                return;
+            }
+
+            users[username] = password;
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('Đăng ký thành công!');
+            showLogin();
+        }
+
+        // Đăng nhập người dùng
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            if (users[username] === password) {
+                localStorage.setItem('currentUser', username);
+                alert('Đăng nhập thành công!');
+                location.reload(); // Tải lại trang sau khi đăng nhập
+            } else {
+                alert('Tên người dùng hoặc mật khẩu không đúng!');
+            }
+        }
+
+        // Đăng xuất
+        function logout() {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        // Hiển thị bài đăng
+        function loadPosts() {
+    const posts = JSON.parse(localStorage.getItem('posts')) || [];
+    const currentUser = localStorage.getItem('currentUser');
+    const postsContainer = document.getElementById('postsContainer');
+    postsContainer.innerHTML = '';
+
+    posts.forEach((post, index) => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.opacity = post.completed ? '0.5' : '1'; // Làm mờ bài đăng đã giao dịch
+        div.innerHTML = `
+            <img src="${post.image || 'https://via.placeholder.com/100'}" alt="Image">
+            <div class="card-content">
+                <h3>${post.type}: ${post.name}</h3>
+                <p>${post.content}</p>
+                ${
+                    !post.completed
+                        ? `<button onclick="markAsCompleted(${index})">Đã giao dịch</button>
+                           <button onclick="deletePost(${index})">Xóa</button>`
+                        : '<p><strong>Đã giao dịch</strong></p>'
+                }
+            </div>
+        `;
+        postsContainer.appendChild(div);
+    });
+}
+
+        // Đăng bài
+        document.getElementById('postForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const name = document.getElementById('name').value;
+            const type = document.getElementById('type').value;
             const content = document.getElementById('content').value;
+            const imageFile = document.getElementById('image').files[0];
 
-            if (name && content) {
-                // Ghi dữ liệu vào Firebase
-                const newPostKey = db.ref().child('posts').push().key;
-                db.ref('posts/' + newPostKey).set({
-                    name: name,
-                    content: content,
-                })
-                .then(() => {
-                    alert('Tin đã được đăng thành công!');
-                    postForm.reset();
-                    loadPosts(); // Cập nhật danh sách sau khi đăng tin
-                })
-                .catch((error) => {
-                    console.error('Lỗi khi ghi dữ liệu:', error);
-                });
+            const reader = new FileReader();
+            reader.onload = function() {
+                const imageBase64 = reader.result;
+
+                const posts = JSON.parse(localStorage.getItem('posts')) || [];
+                posts.push({ name, type, content, image: imageBase64 });
+                localStorage.setItem('posts', JSON.stringify(posts));
+
+                alert('Bài đăng đã được lưu!');
+                loadPosts();
+            };
+
+            if (imageFile) {
+                reader.readAsDataURL(imageFile);
+            } else {
+                const posts = JSON.parse(localStorage.getItem('posts')) || [];
+                posts.push({ name, type, content, image: 'https://via.placeholder.com/100' });
+                localStorage.setItem('posts', JSON.stringify(posts));
+                alert('Bài đăng đã được lưu!');
+                loadPosts();
             }
+
+            document.getElementById('postForm').reset();
         });
 
-        // Hàm tải danh sách tin từ Firebase
-        function loadPosts() {
-            db.ref('posts').once('value', (snapshot) => {
-                postsContainer.innerHTML = '';
-                snapshot.forEach((childSnapshot) => {
-                    const post = childSnapshot.val();
-                    const div = document.createElement('div');
-                    div.className = 'card';
-                    div.innerHTML = `<strong>${post.name}</strong><p>${post.content}</p>`;
-                    postsContainer.appendChild(div);
-                });
-            });
-        }
-
-        // Tải danh sách tin ngay khi trang được tải
-        window.onload = loadPosts;
+        // Tải bài đăng khi mở trang
+        window.onload = function() {
+            checkLogin();
+            loadPosts();
+        };
     </script>
 </body>
 </html>
