@@ -13,6 +13,30 @@ let enemy = {
   maxHealth: 50,
   level: 1,
 };
+// Các hình ảnh bản đồ
+const mapImages = [
+  "images/map1.png", // Đường dẫn tới hình ảnh bản đồ 1
+  "images/map2.png", // Đường dẫn tới hình ảnh bản đồ 2
+  "images/map3.png", // Đường dẫn tới hình ảnh bản đồ 3
+];
+
+// Hàm cập nhật bản đồ
+function updateMap() {
+  document.getElementById("game-container").style.backgroundImage = `url('${mapImages[player.level - 1]}')`;
+}
+
+// Cập nhật logic khi lên cấp
+checkLevelUp = function () {
+  if (player.exp >= expToNextLevel) {
+    player.level++;
+    player.exp -= expToNextLevel;
+    expToNextLevel += 50;
+    player.health = player.maxHealth;
+    updateGameStatus();
+    updateMap(); // Cập nhật bản đồ khi lên cấp
+    alert(`Chúc mừng! Bạn đã lên Level ${player.level}`);
+  }
+};
 
 // EXP cần thiết để lên cấp
 let expToNextLevel = 100;
