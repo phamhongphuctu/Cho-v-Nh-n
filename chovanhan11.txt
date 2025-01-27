@@ -1,245 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sports Betting & Casino</title>
-    <style>
-        /* Tổng thể */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #9b59b6; /* Màu nền tím */
-            color: white;
-        }
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-        header {
-            background-color: #8e44ad; /* Header màu tím đậm */
-            color: white;
-            text-align: center;
-            padding: 15px;
-            font-size: 1.5em;
-        }
+// Nhân vật chính
+const player = {
+  x: 50,
+  y: 50,
+  width: 50,
+  height: 50,
+  color: "blue",
+  speed: 5,
+};
 
-        nav {
-            background-color: #732d91; /* Navigation màu tím đậm hơn */
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 10px 0;
-        }
+// Quái vật
+const enemy = {
+  x: 300,
+  y: 300,
+  width: 50,
+  height: 50,
+  color: "red",
+};
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 5px;
-            padding: 8px 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
+// Xử lý di chuyển
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowUp") player.y -= player.speed;
+  if (e.key === "ArrowDown") player.y += player.speed;
+  if (e.key === "ArrowLeft") player.x -= player.speed;
+  if (e.key === "ArrowRight") player.x += player.speed;
+});
 
-        nav a:hover {
-            background-color: #5a266e; /* Hover tím đậm hơn */
-        }
+// Hàm vẽ nhân vật
+function drawPlayer() {
+  ctx.fillStyle = player.color;
+  ctx.fillRect(player.x, player.y, player.width, player.height);
+}
 
-        .main-container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-        }
+// Hàm vẽ quái vật
+function drawEnemy() {
+  ctx.fillStyle = enemy.color;
+  ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+}
 
-        .section-title {
-            font-size: 1.8em;
-            margin-bottom: 15px;
-            color: white;
-            text-align: center;
-        }
+// Hàm cập nhật game
+function updateGame() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawPlayer();
+  drawEnemy();
+  requestAnimationFrame(updateGame);
+}
 
-        .sports, .casino {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background-color: #8e44ad; /* Màu nền tím cho các thẻ */
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-        }
-
-        .card img {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 15px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .card h3 {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            color: white;
-        }
-
-        .card p {
-            font-size: 0.9em;
-            color: #e1ccec; /* Chữ màu tím nhạt */
-        }
-
-        button {
-            background-color: #732d91; /* Nút tím đậm */
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin-top: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #5a266e;
-        }
-
-        footer {
-            background-color: #732d91; /* Footer màu tím đậm */
-            text-align: center;
-            color: white;
-            padding: 15px;
-            margin-top: 30px;
-        }
-
-        /* Responsive cho thiết bị di động */
-        @media (max-width: 768px) {
-            nav {
-                flex-direction: column;
-            }
-
-            nav a {
-                margin: 5px 0;
-                width: 90%;
-                text-align: center;
-            }
-
-            .card img {
-                width: 80px;
-                height: 80px;
-            }
-
-            .card h3 {
-                font-size: 1em;
-            }
-
-            .card p {
-                font-size: 0.8em;
-            }
-
-            button {
-                padding: 8px 15px;
-                font-size: 0.9em;
-            }
-
-            .section-title {
-                font-size: 1.5em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .main-container {
-                padding: 10px;
-            }
-
-            .card {
-                padding: 15px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        Sports Betting & Casino Demo
-    </header>
-    <nav>
-        <a href="#sports">Sports Betting</a>
-        <a href="#casino">Casino Games</a>
-        <a href="#contact">Contact Us</a>
-    </nav>
-
-    <div class="main-container">
-        <!-- Sports Section -->
-        <section id="sports">
-            <h2 class="section-title">Sports Betting</h2>
-            <div class="sports">
-                <div class="card">
-                    <img src="https://via.placeholder.com/100" alt="Soccer">
-                    <h3>Soccer</h3>
-                    <p>Bet on your favorite teams and leagues worldwide!</p>
-                    <button onclick="placeBet('Soccer')">Place Bet</button>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/100" alt="Basketball">
-                    <h3>Basketball</h3>
-                    <p>NBA, EuroLeague, and more exciting games to bet on.</p>
-                    <button onclick="placeBet('Basketball')">Place Bet</button>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/100" alt="Tennis">
-                    <h3>Tennis</h3>
-                    <p>Grand Slams, ATP, and WTA tours await your predictions.</p>
-                    <button onclick="placeBet('Tennis')">Place Bet</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Casino Section -->
-        <section id="casino">
-            <h2 class="section-title">Casino Games</h2>
-            <div class="casino">
-                <div class="card">
-                    <img src="https://via.placeholder.com/100" alt="Blackjack">
-                    <h3>Blackjack</h3>
-                    <p>Enjoy classic blackjack games with great odds.</p>
-                    <button onclick="playGame('Blackjack')">Play Now</button>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/100" alt="Roulette">
-                    <h3>Roulette</h3>
-                    <p>Spin the wheel and test your luck in this iconic game.</p>
-                    <button onclick="playGame('Roulette')">Play Now</button>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/100" alt="Slots">
-                    <h3>Slots</h3>
-                    <p>Exciting slot games with high payouts and jackpots!</p>
-                    <button onclick="playGame('Slots')">Play Now</button>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <footer>
-        © 2025 Sports Betting & Casino Demo. All rights reserved.
-    </footer>
-
-    <script>
-        // Fake functions for demo purposes
-        function placeBet(game) {
-            alert(`You have placed a bet on ${game}.`);
-        }
-
-        function playGame(game) {
-            alert(`You have started playing ${game}.`);
-        }
-    </script>
-</body>
-</html>
-
+// Bắt đầu game
+updateGame();
